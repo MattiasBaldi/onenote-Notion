@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 import { fileURLToPath } from "node:url";
-import { run as runOnenote } from "./src/services/onenote/index.js";
-import { run as runSync } from "./src/core/index.js";
-import { loadConfig, getOrchestrationConfig } from "./src/lib/config-loader.js";
-import { loadEnvFile } from "./src/services/onenote/auth.js";
+import path from "node:path";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const srcDir = path.join(__dirname, "src");
+
 
 // Simple flag parser
 function parseFlags(args) {
@@ -69,17 +70,24 @@ Examples:
 }
 
 export async function run(argv = process.argv.slice(2)) {
-  await loadEnvFile();
-  const config = await loadConfig();
-  const orchestration = getOrchestrationConfig(config);
-
   const { flags, positional } = parseFlags(argv);
   const [command, subcommand, ...rest] = positional;
 
+  // Show help immediately without loading config
   if (!command || flags.h || flags.help) {
     showHelp();
     return;
   }
+
+  // Dynamic imports with absolute paths
+  const { loadEnvFile } = await import(path.join(srcDir, "services/onenote/auth.js"));
+  const { loadConfig, getOrchestrationConfig } = await import(path.join(srcDir, "lib/config-loader.js"));
+  const { run: runOnenote } = await import(path.join(srcDir, "services/onenote/index.js"));
+  const { run: runSync } = await import(path.join(srcDir, "core/index.js"));
+
+  await loadEnvFile();
+  const config = await loadConfig();
+  const orchestration = getOrchestrationConfig(config);
 
   // Reconstruct args with flags for downstream services
   const reconstructedArgs = [
@@ -107,9 +115,10 @@ export async function run(argv = process.argv.slice(2)) {
     // Legacy/Internal compatibility
     case "onenote":
       return runOnenote([subcommand, ...rest]);
-    case "notion":
-      const { run: runNotion } = await import("./src/services/notion/index.js");
+    case "notion": {
+      const { run: runNotion } = await import(path.join(srcDir, "services/notion/index.js"));
       return runNotion([subcommand, ...rest]);
+    }
 
     default:
       console.error(`Unknown command: ${command}. Run with --help for usage.`);
@@ -117,12 +126,8 @@ export async function run(argv = process.argv.slice(2)) {
   }
 }
 
-const mainPath = process.argv[1] ? (process.argv[1].startsWith("/") ? process.argv[1] : fileURLToPath(new URL(process.argv[1], `file://${process.cwd()}/`))) : null;
-const currentPath = fileURLToPath(import.meta.url);
-
-if (mainPath === currentPath) {
-  run().catch((error) => {
-    console.error(error instanceof Error ? error.stack || error.message : String(error));
-    process.exitCode = 1;
-  });
-}
+// Always execute if run as main module
+run().catch((error) => {
+  console.error(error instanceof Error ? error.stack || error.message : String(error));
+  process.exitCode = 1;
+});
