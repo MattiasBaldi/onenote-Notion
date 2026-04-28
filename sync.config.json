@@ -1,0 +1,34 @@
+{
+  "orchestration": {
+    "defaultNamespace": "sync"
+  },
+  "sync": {
+    "defaultProfile": "work",
+    "defaults": {
+      "limits": {
+        "maxNotebooks": 1000,
+        "maxSectionsPerNotebook": 1,
+        "maxPagesPerSection": 1,
+        "maxPages": 1,
+        "maxPayloadChars": 60000
+      }
+    },
+    "profiles": {
+      "work": {
+        "source": {
+          "service": "onenote"
+        },
+        "destination": {
+          "service": "notion",
+          "parentPageId": "34f0f4649ca4805f8ccbd749c2006f43"
+        },
+        "selection": {
+          "notebookIds": [
+            "0-A0F8DD70BB0648F5!2318"
+          ],
+          "limitPages": 1
+        }
+      }
+    }
+  }
+}
