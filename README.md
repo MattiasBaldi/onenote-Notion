@@ -1,135 +1,130 @@
-# OneNote to Notion Sync (o2n)
+# o2n: OneNote to Notion Sync
 
-Automatically sync your Microsoft OneNote notebooks to Notion with AI-powered transformation. o2n intelligently converts OneNote content to Notion-compatible format using OpenAI and live API documentation.
+Transfer your Microsoft OneNote notebooks to Notion with AI-powered transformation. o2n converts OneNote pages to Notion-compatible schemas automatically, with intelligent batching and full preview/review workflow.
 
-## Features
+## Quick Setup
 
-- **Intelligent Sync**: Preview, plan, and apply syncs with full control
-- **AI-Powered**: Converts OneNote formatting to Notion schemas automatically
-- **Batch Processing**: Optimizes token usage with intelligent batching
-- **Multi-Profile**: Support multiple sync configurations (work, personal, etc.)
-- **Live Documentation**: Uses Context7 to generate schemas based on current API specs
-
-## Before You Start
-
-You'll need:
-- Node.js 20 or higher
-- Microsoft OneNote account with Graph API app registered
-- Notion workspace with integration token
-- OpenAI API key
-- Context7 API key
-
-## Installation
-
-1. Clone and install:
 ```bash
-npm install
-npm link
+npm install && npm link
+
+# Set environment variables
+export ONENOTE_CLIENT_ID=your-app-id
+export NOTION_TOKEN=your-token
+export OPENAI_API_KEY=your-key
+export CONTEXT7_API_KEY=your-key
+
+# Create sync config
+cp sync.config.json.example sync.config.json
+# Edit with your Notion page ID and OneNote notebook IDs
+
+# Authenticate
+o2n auth login
+
+# Sync
+o2n sync preview    # See what matches your config
+o2n sync apply -y   # Run sync
 ```
 
-2. Create `.env` in the project root:
-```bash
-ONENOTE_CLIENT_ID="your-app-id"
-NOTION_TOKEN="your-integration-token"
-OPENAI_API_KEY="your-key"
-CONTEXT7_API_KEY="your-key"
-```
+## What It Does
 
-3. Configure sync profile in `sync.config.json`:
+1. **Preview**: Scans OneNote notebooks and matches against your configuration
+2. **Plan**: Uses AI to generate Notion schemas from OneNote content
+3. **Apply**: Batches pages through LLM and creates them in Notion
+
+The process ensures nothing is lost—you review the plan before applying.
+
+## Commands
+
+| Command | Purpose |
+|---------|---------|
+| `o2n auth login` | Sign in to OneNote |
+| `o2n list notebooks` | Browse your OneNote structure |
+| `o2n sync preview` | See pages that will sync |
+| `o2n sync plan` | Review transformation plan |
+| `o2n sync apply` | Execute sync |
+| `o2n config` | Show settings |
+
+## Flags
+
+| Flag | Effect |
+|------|--------|
+| `-p, --profile` | Use different config profile |
+| `-y, --yes` | Skip confirmation prompts |
+| `-j, --json` | JSON output |
+| `-v, --verbose` | Detailed logging |
+| `-h, --help` | Show help |
+
+## Configuration
+
+Create `sync.config.json`:
+
 ```json
 {
   "sync": {
     "profiles": {
       "work": {
         "source": { "service": "onenote" },
-        "destination": { "service": "notion", "parentPageId": "page-uuid" },
-        "selection": { "notebookIds": ["notebook-id"] }
+        "destination": { 
+          "service": "notion", 
+          "parentPageId": "your-notion-page-uuid" 
+        },
+        "selection": { 
+          "notebookIds": ["notebook-id"] 
+        }
       }
     }
   }
 }
 ```
 
-4. Log in:
-```bash
-o2n auth login
-```
-
-5. Run sync:
-```bash
-o2n sync preview          # See what will be synced
-o2n sync plan             # Review transformation plan
-o2n sync apply -y         # Execute sync
-```
-
-## How the Sync Works
-
-Three stages for control and quality:
-
-1. **Preview**: Identifies matching pages
-2. **Plan**: Generates Notion schemas via AI
-3. **Apply**: Batches through LLM and creates pages
-
-## Core Commands
-
-| Command | What It Does |
-|---------|--------------|
-| `o2n auth login/logout` | Manage OneNote authentication |
-| `o2n list notebooks` | Browse OneNote structure |
-| `o2n list sections <id>` | View sections in a notebook |
-| `o2n list pages <id>` | View pages in a section |
-| `o2n sync preview` | See matching pages |
-| `o2n sync plan` | Review transformation plan |
-| `o2n sync apply` | Run the sync |
-| `o2n config` | Show active settings |
-
-## Useful Flags
-
-| Flag | Effect |
-|------|--------|
-| `-p, --profile <name>` | Use different sync config (default: work) |
-| `-y, --yes` | Skip prompts (auto-confirm) |
-| `-j, --json` | Output as JSON |
-| `-v, --verbose` | Detailed logging |
-
 ## Examples
 
 ```bash
-# Explore your OneNote
+# List what you have
 o2n list notebooks
 o2n list sections notebook-id
 
-# Sync specific profile
+# Try a dry-run sync
+o2n sync preview
+o2n sync plan
+
+# Sync everything
+o2n sync apply -y
+
+# Different profile
 o2n sync preview --profile personal
 o2n sync apply -y --profile personal
 
-# JSON output
+# JSON output for scripting
 o2n list notebooks --json
-
-# Debug with verbose output
-o2n sync plan --verbose
 ```
 
-## Project Structure
+## Requirements
+
+- Node.js 20+
+- OneNote account with Graph API credentials
+- Notion workspace with integration token
+- OpenAI and Context7 API keys
+
+## How It Works
+
+OneNote pages are fetched via Microsoft Graph API and converted to Markdown. Content is sent to OpenAI with live API schemas from Context7. Notion-compliant pages are created with batched processing to optimize tokens.
+
+## Architecture
 
 ```
-src/
-  services/      OneNote, Notion, and AI integrations
-  core/          Sync engine with plan-apply workflow
-  lib/           Config loading and utilities
+src/services/    OneNote, Notion, and AI integrations
+src/core/        Sync engine (preview, plan, apply)
+src/lib/         Config loading and utilities
 ```
 
-## Troubleshooting
+## Get Help
 
-Command not found after npm link?
 ```bash
-which o2n                    # Check if installed
-npm config get prefix        # Verify npm paths
-node /path/to/cli.js --help  # Run directly
+o2n --help              # All commands
+o2n sync --help         # Sync options
+which o2n               # Verify installation
+npm list -g             # Check global packages
 ```
 
-For other issues, check your .env file and API credentials are valid.
-
-## License
-
-MIT
+No complex setup. Configure, authenticate, sync.
