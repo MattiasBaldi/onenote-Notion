@@ -21,7 +21,7 @@ The o2n project has **three main API layers**:
 - **Context7 Integration**: Fetches live API documentation from Notion and Microsoft Graph docs
 - Generates transformation schemas from OneNote to Notion format
 - Uses batched LLM calls to optimize token usage
-- **Required environment variables**: `OPENAI_API_KEY`, `CONTEXT7_API_KEY`
+- **Required environment variables**: `AGENT_API_KEY`, `CONTEXT7_API_KEY`
 
 ### 4. Core Sync Engine (`src/core/`)
 - Three-stage workflow: **Preview** → **Plan** → **Apply**
@@ -37,7 +37,7 @@ The o2n project has **three main API layers**:
 ```bash
 NOTION_TOKEN=your-notion-integration-token
 ONENOTE_CLIENT_ID=your-azure-app-id
-OPENAI_API_KEY=your-openai-key
+AGENT_API_KEY=your-openai-key
 CONTEXT7_API_KEY=your-context7-key
 ```
 

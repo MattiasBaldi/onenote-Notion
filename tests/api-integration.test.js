@@ -80,9 +80,9 @@ async function runTests() {
   });
 
   await test("OpenAI API key validation", async () => {
-    const key = process.env.OPENAI_API_KEY;
-    if (!key) throw new Error("OPENAI_API_KEY not set (required for LLM)");
-    if (key.length < 10) throw new Error("OPENAI_API_KEY appears invalid");
+    const key = process.env.AGENT_API_KEY;
+    if (!key) throw new Error("AGENT_API_KEY not set (required for LLM)");
+    if (key.length < 10) throw new Error("AGENT_API_KEY appears invalid");
   });
 
   await test("Agent schemas validation", async () => {
@@ -137,7 +137,7 @@ async function runTests() {
   if (testsFailed > 0) {
     console.log("Issues found:");
     console.log("  - Ensure all .env variables are set:");
-    console.log("    NOTION_TOKEN, ONENOTE_CLIENT_ID, OPENAI_API_KEY, CONTEXT7_API_KEY");
+    console.log("    NOTION_TOKEN, ONENOTE_CLIENT_ID, AGENT_API_KEY, CONTEXT7_API_KEY");
     console.log("  - Run: npm link");
     console.log("  - Check: which o2n");
     process.exit(1);

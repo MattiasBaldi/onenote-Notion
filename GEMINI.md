@@ -13,7 +13,7 @@ This project is a high-performance Node.js CLI tool designed to synchronize cont
     - `src/lib/`: Internal utility library for configuration loading and system plumbing.
 - **Key Technologies**:
     - **Node.js (ESM)**: Modern JavaScript module system.
-    - **LangChain & OpenAI**: For intelligent sync planning and schema-valid translations.
+    - **LangChain & LLM**: For intelligent sync planning and schema-valid translations (supports OpenAI, Claude, etc.).
     - **Context7**: Real-time retrieval of developer documentation to stay current with API constraints.
     - **Zod**: Runtime schema validation for configuration and sync plans.
 
@@ -24,7 +24,7 @@ This project is a high-performance Node.js CLI tool designed to synchronize cont
 - Node.js (Latest LTS recommended)
 - Microsoft Azure App Registration (for OneNote Graph API access)
 - Notion Integration Token
-- OpenAI API Key (for the sync planner)
+- LLM API Key (for the agent: OpenAI, Claude, etc.)
 - Context7 API Key (for documentation lookup)
 
 ### Installation
@@ -39,7 +39,7 @@ The CLI loads a `.env` file from the root. Key variables:
 
 - `ONENOTE_CLIENT_ID`: Azure App Client ID.
 - `NOTION_TOKEN` / `NOTION_API_KEY`: Notion integration secret.
-- `OPENAI_API_KEY`: Required for the planner agent.
+- `AGENT_API_KEY`: Required for the planner agent (can use OpenAI, Claude, or other LLM providers).
 - `CONTEXT7_API_KEY`: Required for live docs lookup.
 - `ONENOTE_ACCESS_TOKEN` (Optional): Manual override for Graph API.
 

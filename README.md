@@ -10,7 +10,7 @@ npm install && npm link
 # Set environment variables
 export ONENOTE_CLIENT_ID=your-app-id
 export NOTION_TOKEN=your-token
-export OPENAI_API_KEY=your-key
+export AGENT_API_KEY=your-key
 export CONTEXT7_API_KEY=your-key
 
 # Create sync config
