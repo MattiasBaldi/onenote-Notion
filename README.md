@@ -99,16 +99,47 @@ o2n sync apply -y --profile personal
 o2n list notebooks --json
 ```
 
+## Using Local LLMs
+
+Instead of paying for OpenAI, you can use a local LLM like **LM Studio**, **Ollama**, or any OpenAI-compatible endpoint.
+
+### With LM Studio
+
+1. Start LM Studio with a model loaded
+2. Set environment variables:
+```bash
+export LLM_BASE_URL=http://localhost:1234/v1
+export AGENT_MODEL=local-model
+# Leave AGENT_API_KEY empty or set to anything
+```
+
+3. Run sync normally:
+```bash
+o2n sync preview
+o2n sync apply -y
+```
+
+That's it. LangChain will use your local LLM instead of OpenAI.
+
+### With Ollama
+
+```bash
+export LLM_BASE_URL=http://localhost:11434/v1
+export AGENT_MODEL=mistral  # or any model you've pulled
+o2n sync apply -y
+```
+
 ## Requirements
 
 - Node.js 20+
 - OneNote account with Graph API credentials
 - Notion workspace with integration token
-- OpenAI and Context7 API keys
+- Context7 API key (for live docs)
+- LLM: OpenAI API key, or local LM (LM Studio, Ollama, etc.)
 
 ## How It Works
 
-OneNote pages are fetched via Microsoft Graph API and converted to Markdown. Content is sent to OpenAI with live API schemas from Context7. Notion-compliant pages are created with batched processing to optimize tokens.
+OneNote pages are fetched via Microsoft Graph API and converted to Markdown. Content is sent to an LLM (OpenAI, Claude, local, etc.) with live API schemas from Context7. Notion-compliant pages are created with batched processing to optimize tokens.
 
 ## Architecture
 

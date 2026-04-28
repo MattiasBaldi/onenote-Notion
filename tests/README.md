@@ -17,11 +17,12 @@ The o2n project has **three main API layers**:
 - **Required environment variable**: `NOTION_TOKEN`
 
 ### 3. Agent Layer (LangChain + Context7)
-- **LangChain Agent**: Orchestrates the sync workflow using OpenAI LLM
+- **LangChain Agent**: Orchestrates sync using any LLM (OpenAI, Claude, local, etc.)
 - **Context7 Integration**: Fetches live API documentation from Notion and Microsoft Graph docs
 - Generates transformation schemas from OneNote to Notion format
 - Uses batched LLM calls to optimize token usage
-- **Required environment variables**: `AGENT_API_KEY`, `CONTEXT7_API_KEY`
+- **Required environment variables**: `AGENT_API_KEY` (or leave empty for local LLMs), `CONTEXT7_API_KEY`
+- **Optional**: `LLM_BASE_URL` for local LMs (LM Studio, Ollama, etc.)
 
 ### 4. Core Sync Engine (`src/core/`)
 - Three-stage workflow: **Preview** → **Plan** → **Apply**
@@ -33,11 +34,22 @@ The o2n project has **three main API layers**:
 
 ### Setup
 
-1. Create `.env` with all required API keys:
+1. Create `.env` with required API keys:
+
+For OpenAI:
 ```bash
 NOTION_TOKEN=your-notion-integration-token
 ONENOTE_CLIENT_ID=your-azure-app-id
 AGENT_API_KEY=your-openai-key
+CONTEXT7_API_KEY=your-context7-key
+```
+
+For local LLM (LM Studio):
+```bash
+NOTION_TOKEN=your-notion-integration-token
+ONENOTE_CLIENT_ID=your-azure-app-id
+LLM_BASE_URL=http://localhost:1234/v1
+AGENT_MODEL=local-model
 CONTEXT7_API_KEY=your-context7-key
 ```
 
