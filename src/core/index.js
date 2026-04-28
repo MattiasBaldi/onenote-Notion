@@ -329,3 +329,6 @@ export async function run(argv = []) {
 
   throw new Error(`Unknown sync command: ${args.command}`);
 }
+
+// Export engine functions for tests
+export { applySyncPlan, buildSyncPlan, loadSourceItemsOnly };

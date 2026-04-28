@@ -1,5 +1,5 @@
 import { Context7 } from "@upstash/context7-sdk";
-import { tool } from "langchain";
+import { tool } from "@langchain/core/tools";
 import * as z from "zod";
 
 const SERVICE_LIBRARY_IDS = {

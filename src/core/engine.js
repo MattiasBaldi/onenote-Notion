@@ -1,4 +1,3 @@
-import { createAgent } from "langchain";
 import { createNotionClient, createPage as createNotionPage, getPageMarkdown, search, updatePage } from "../services/notion/service.js";
 import { getAccessToken } from "../services/onenote/auth.js";
 import {
@@ -10,7 +9,37 @@ import {
   listSectionPages,
 } from "../services/onenote/graph.js";
 import { readServiceDocsTool } from "../services/agent/tools.js";
+import { createLLMClient } from "../lib/llm-client.js";
 import { BatchSyncItemPlanSchema, SyncItemPlanSchema, SyncPlanSchema } from "./schemas.js";
+
+// Create a simple agent factory that wraps the LLM client
+function createAgent({ model, tools, systemPrompt, responseFormat }) {
+  const llmClient = createLLMClient({
+    provider: process.env.LLM_PROVIDER || "gemini",
+    apiKey: process.env.AGENT_API_KEY,
+    modelName: model || process.env.AGENT_MODEL,
+  });
+
+  return {
+    invoke: async ({ messages }) => {
+      const userMessage = messages?.[0]?.content || "";
+      const fullPrompt = systemPrompt + "\n\n" + userMessage;
+
+      // Add timeout for LLM API call (30 seconds)
+      const result = await Promise.race([
+        llmClient.invoke(fullPrompt),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("LLM API timeout")), 30000)
+        ),
+      ]);
+
+      const responseText = typeof result === "string" ? result : result.content || String(result);
+      return {
+        structuredResponse: responseFormat ? responseFormat.parse(JSON.parse(responseText)) : responseText,
+      };
+    },
+  };
+}
 
 function isPlainObject(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
