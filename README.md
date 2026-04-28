@@ -1,33 +1,48 @@
-# OneNote to Notion Sync
+# OneNote to Notion Sync (o2n)
 
-A high-performance Node.js CLI for synchronizing content from Microsoft OneNote to Notion with AI-driven transformation and intelligent batching.
+Automatically sync your Microsoft OneNote notebooks to Notion with AI-powered transformation. o2n intelligently converts OneNote content to Notion-compatible format using OpenAI and live API documentation.
 
-## Quick Start
+## Features
 
-### 1. Environment Setup
-Create a .env file in the root:
-```bash
-ONENOTE_CLIENT_ID="your-client-id"
-NOTION_TOKEN="your-notion-token"
-OPENAI_API_KEY="your-openai-key"
-CONTEXT7_API_KEY="your-context7-key"
-```
+- **Intelligent Sync**: Preview, plan, and apply syncs with full control
+- **AI-Powered**: Converts OneNote formatting to Notion schemas automatically
+- **Batch Processing**: Optimizes token usage with intelligent batching
+- **Multi-Profile**: Support multiple sync configurations (work, personal, etc.)
+- **Live Documentation**: Uses Context7 to generate schemas based on current API specs
 
-### 2. Install & Link
+## Before You Start
+
+You'll need:
+- Node.js 20 or higher
+- Microsoft OneNote account with Graph API app registered
+- Notion workspace with integration token
+- OpenAI API key
+- Context7 API key
+
+## Installation
+
+1. Clone and install:
 ```bash
 npm install
 npm link
 ```
 
-### 3. Configure
-Edit `sync.config.json`:
+2. Create `.env` in the project root:
+```bash
+ONENOTE_CLIENT_ID="your-app-id"
+NOTION_TOKEN="your-integration-token"
+OPENAI_API_KEY="your-key"
+CONTEXT7_API_KEY="your-key"
+```
+
+3. Configure sync profile in `sync.config.json`:
 ```json
 {
   "sync": {
     "profiles": {
       "work": {
         "source": { "service": "onenote" },
-        "destination": { "service": "notion", "parentPageId": "page-id" },
+        "destination": { "service": "notion", "parentPageId": "page-uuid" },
         "selection": { "notebookIds": ["notebook-id"] }
       }
     }
@@ -35,84 +50,86 @@ Edit `sync.config.json`:
 }
 ```
 
-### 4. Authenticate
+4. Log in:
 ```bash
 o2n auth login
 ```
 
-### 5. Sync
+5. Run sync:
 ```bash
-o2n sync preview    # See what will be synced
-o2n sync apply -y   # Execute sync
+o2n sync preview          # See what will be synced
+o2n sync plan             # Review transformation plan
+o2n sync apply -y         # Execute sync
 ```
 
-## Commands
+## How the Sync Works
 
-| Command | Purpose |
-|---------|---------|
-| `o2n auth login` | Sign in to Microsoft OneNote |
-| `o2n auth logout` | Clear session |
-| `o2n list notebooks` | List all notebooks |
-| `o2n list sections <id>` | List sections in notebook |
-| `o2n list pages <id>` | List pages in section |
-| `o2n sync preview` | Preview pages to sync |
-| `o2n sync plan` | Generate transformation plan |
-| `o2n sync apply` | Execute sync |
-| `o2n config` | Show active configuration |
+Three stages for control and quality:
 
-## Flags
+1. **Preview**: Identifies matching pages
+2. **Plan**: Generates Notion schemas via AI
+3. **Apply**: Batches through LLM and creates pages
 
-| Flag | Description |
-|------|-------------|
-| `-p, --profile <name>` | Sync profile (default: work) |
-| `-y, --yes` | Skip confirmation |
-| `-j, --json` | JSON output |
+## Core Commands
+
+| Command | What It Does |
+|---------|--------------|
+| `o2n auth login/logout` | Manage OneNote authentication |
+| `o2n list notebooks` | Browse OneNote structure |
+| `o2n list sections <id>` | View sections in a notebook |
+| `o2n list pages <id>` | View pages in a section |
+| `o2n sync preview` | See matching pages |
+| `o2n sync plan` | Review transformation plan |
+| `o2n sync apply` | Run the sync |
+| `o2n config` | Show active settings |
+
+## Useful Flags
+
+| Flag | Effect |
+|------|--------|
+| `-p, --profile <name>` | Use different sync config (default: work) |
+| `-y, --yes` | Skip prompts (auto-confirm) |
+| `-j, --json` | Output as JSON |
 | `-v, --verbose` | Detailed logging |
-| `-h, --help` | Show help |
 
 ## Examples
 
 ```bash
-# List notebooks as JSON
-o2n list notebooks --json
+# Explore your OneNote
+o2n list notebooks
+o2n list sections notebook-id
 
-# Sync with specific profile
+# Sync specific profile
 o2n sync preview --profile personal
 o2n sync apply -y --profile personal
 
-# Sync with verbose output
-o2n sync apply --verbose
+# JSON output
+o2n list notebooks --json
+
+# Debug with verbose output
+o2n sync plan --verbose
 ```
 
-## Architecture
+## Project Structure
 
-The project uses a layered, modular design:
-
-- **services/**: Integrations for OneNote, Notion, and AI agents
-- **core/**: Sync engine with plan-apply workflow and batch processing
-- **lib/**: Configuration loading and utilities
-
-The sync process works in three stages:
-
-1. **Preview**: Identify pages matching your configuration
-2. **Plan**: Generate AI-driven transformation schemas
-3. **Apply**: Transfer pages with batched LLM processing (multiple items per call)
-
-## How It Works
-
-OneNote pages are fetched through Microsoft Graph API. Content is extracted as Markdown and passed to LangChain with OpenAI. The AI generates Notion-compliant schemas using live documentation from Context7. Pages are created in Notion with intelligent batching to optimize token usage.
-
-## Requirements
-
-- Node.js 20+
-- Microsoft OneNote account with Graph API access
-- Notion workspace with integration token
-- OpenAI API key
-- Context7 API key (for live documentation)
+```
+src/
+  services/      OneNote, Notion, and AI integrations
+  core/          Sync engine with plan-apply workflow
+  lib/           Config loading and utilities
+```
 
 ## Troubleshooting
 
-If `o2n` command not found after `npm link`, check:
-- Node modules are in PATH: `which o2n`
-- npm global bin directory: `npm config get prefix`
-- Manually run: `node /path/to/cli.js --help`
+Command not found after npm link?
+```bash
+which o2n                    # Check if installed
+npm config get prefix        # Verify npm paths
+node /path/to/cli.js --help  # Run directly
+```
+
+For other issues, check your .env file and API credentials are valid.
+
+## License
+
+MIT
